@@ -21,9 +21,9 @@ module.exports = function(app) {
         res.send(response);
     });
 
-
-    app.get('/sum', function (req, res) {
-        let response = req.query.num1 + req.query.num2;
-        res.send(response);
-    })
+    app.post('/song', function(req, res) {
+        res.send('Added song: ' + req.body.title + '<br>'
+            + ' genre: ' + req.body.genre + '<br>'
+            + ' price: ' + req.body.price);
+    });
 };
