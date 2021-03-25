@@ -3,15 +3,8 @@ let app = express();
 
 app.set('port', 8081);
 
-
-app.get('/users', function (req, res) {
-    console.log("debug here");
-    res.send('show users');
-});
-
-app.get('/songs', function(req, res) {
-    res.send('show songs');
-});
+require("./routes/users.js")(app);
+require("./routes/songs.js")(app);
 
 // Launch server
 app.listen(app.get('port'), function () {
