@@ -19,6 +19,11 @@ module.exports = function(app, swig, DBManager) {
     });
 
     app.get('/songs/add', function (req, res) {
+        if ( req.session.user == null){
+            res.redirect("/shop");
+            return;
+        }
+
         let response = swig.renderFile('views/add-song.html', {
 
         });
@@ -37,10 +42,17 @@ module.exports = function(app, swig, DBManager) {
     });
 
     app.post('/song', function(req, res) {
+        if ( req.session.user == null){
+            res.redirect("/shop");
+            return;
+        }
+
+
         let song = {
             title : req.body.title,
             genre : req.body.genre,
-            price : req.body.price
+            price : req.body.price,
+            author : req.session.user
         }
         DBManager.insertSong(song, function(id){
             if (id == null) {
