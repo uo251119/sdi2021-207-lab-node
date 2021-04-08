@@ -21,5 +21,23 @@ module.exports = {
                 });
             }
         });
-    }
+    },
+    getSongs : function(criteria, functionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                functionCallback(null);
+            } else {
+                let collection = db.collection('songs');
+                collection.find(criteria).toArray(function(err, songs) {
+                    if (err) {
+                        functionCallback(null);
+                    } else {
+                        functionCallback(songs);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+
 };

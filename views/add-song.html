@@ -2,7 +2,7 @@
 {% block title %} Agregar canción {% endblock %}
 {% block main_content %}
 <h2>Agregar canción</h2>
-<form class="form-horizontal" method="post" action="/song">
+<form class="form-horizontal" method="post" action="/song" encType="multipart/form-data">
   <div class="form-group">
     <label class="control-label col-sm-2" for="title">Nombre:</label>
     <div class="col-sm-10">
@@ -35,13 +35,13 @@
   <div class="form-group">
     <label class="control-label col-sm-2" for="cover">Imagen portada:</label>
     <div class="col-sm-10">
-      <input type="file" class="custom-file-input" name="cover" />
+      <input type="file" class="custom-file-input" name="cover" accept=".png" required/>
     </div>
   </div>
   <div class="form-group">
     <label class="control-label col-sm-2" for="audio">Fichero audio:</label>
     <div class="col-sm-10">
-      <input type="file" class="custom-file-input" name="audio" />
+      <input type="file" class="custom-file-input" name="audio" accept=".mp3" required/>
     </div>
   </div>
   <div class="form-group">
