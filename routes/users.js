@@ -25,6 +25,11 @@ module.exports = function(app, swig, DBManager) {
     });
 
     app.get("/signin", function(req, res) {
+        let response = swig.renderFile('views/signin.html', {});
+        res.send(response);
+    });
+
+    app.post("/signin", function(req, res) {
         let safe = app.get("crypto").createHmac('sha256', app.get('key'))
             .update(req.body.password).digest('hex');
         let criteria = {

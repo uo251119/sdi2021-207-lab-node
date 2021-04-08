@@ -39,6 +39,23 @@ module.exports = {
             }
         });
     },
+    editSong : function(criteria, song, functionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                functionCallback(null);
+            } else {
+                let collection = db.collection('songs');
+                collection.update(criteria, {$set: song}, function(err, result) {
+                    if (err) {
+                        functionCallback(null);
+                    } else {
+                        functionCallback(result);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
     insertUser : function(user, functionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
