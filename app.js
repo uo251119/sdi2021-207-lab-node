@@ -29,6 +29,7 @@ routerUserSession.use(function(req, res, next) {
 });
 app.use("/songs/add", routerUserSession);
 app.use("/uploads", routerUserSession);
+app.use("/comments", routerUserSession);
 //routerAudios
 let routerAudios = express.Router();
 routerAudios.use(function(req, res, next) {
@@ -59,6 +60,7 @@ app.use(bodyParser.urlencoded());
 
 require("./routes/users.js")(app, swig, DBManager);
 require("./routes/songs.js")(app, swig, DBManager);
+require("./routes/comments.js")(app, swig, DBManager);
 
 
 

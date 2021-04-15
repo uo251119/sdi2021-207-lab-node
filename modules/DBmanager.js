@@ -90,4 +90,38 @@ module.exports = {
             }
         });
     },
+    insertComment : function(comment, functionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                functionCallback(null);
+            } else {
+                let collection = db.collection('comments');
+                collection.insert(comment, function (err, result) {
+                    if (err) {
+                        functionCallback(null);
+                    } else {
+                        functionCallback(result.ops[0]._id);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+    getComments : function(criteria, functionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                functionCallback(null);
+            } else {
+                let collection = db.collection('comments');
+                collection.find(criteria).toArray(function(err, comments) {
+                    if (err) {
+                        functionCallback(null);
+                    } else {
+                        functionCallback(comments);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
 };

@@ -1,23 +1,4 @@
 module.exports = function(app, swig, DBManager) {
-    app.get("/songs", function(req, res) {
-        let songs = [{
-            "title" : "Blank space",
-            "price" : "1.2"
-        }, {
-            "title" : "See you again",
-            "price" : "1.3"
-        }, {
-            "title" : "Uptown funk",
-            "price" : "1.1"
-        }];
-
-        let response = swig.renderFile('views/shop.html', {
-            seller: 'Tienda de canciones',
-            songs: songs
-        });
-        res.send(response);
-    });
-
     app.get('/songs/add', function (req, res) {
         /*
         if ( req.session.user == null){
@@ -32,10 +13,6 @@ module.exports = function(app, swig, DBManager) {
         res.send(response);
     })
 
-    app.get('/songs/:id', function(req, res) {
-        let response = 'id: ' + req.params.id;
-        res.send(response);
-    });
 
     app.get('/songs/:genre/:id', function(req, res) {
         let response = 'id: ' + req.params.id + '<br>'
@@ -157,11 +134,18 @@ module.exports = function(app, swig, DBManager) {
             if ( songs == null ){
                 res.send("Error al recuperar la canción.");
             } else {
-                let response = swig.renderFile('views/song.html',
-                    {
-                        song : songs[0]
-                    });
-                res.send(response);
+                criteria = { "song_id" : DBManager.mongo.ObjectID(req.params.id) };
+                DBManager.getComments(criteria, function(comments){
+                    if(comments == null) {
+                        res.send("Error al recuperar los comentarios.");
+                    } else {
+                        let response = swig.renderFile('views/song.html',
+                            {
+                                song : songs[0]
+                            });
+                        res.send(response);
+                    }
+                });
             }
         });
     });
