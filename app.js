@@ -30,7 +30,30 @@ routerUserSession.use(function(req, res, next) {
 app.use("/songs/add", routerUserSession);
 app.use("/uploads", routerUserSession);
 app.use("/comments", routerUserSession);
-//routerAudios
+
+// routerUserAuthor
+let routerUserAuthor = express.Router();
+routerUserAuthor.use(function(req, res, next) {
+    console.log("routerUserAuthor");
+    let path = require('path');
+    let id = path.basename(req.originalUrl);
+// Cuidado porque req.params no funciona
+// en el router si los params van en la URL.
+    DBManager.getSongs(
+        {_id: mongo.ObjectID(id) }, function (songs) {
+            console.log(songs[0]);
+            if(songs[0].author == req.session.user ){
+                next();
+            } else {
+                res.redirect("/shop");
+            }
+        })
+});
+// Aplicar routerUserAuthor
+app.use("/song/edit", routerUserAuthor);
+app.use("/song/remove", routerUserAuthor);
+
+// routerAudios
 let routerAudios = express.Router();
 routerAudios.use(function(req, res, next) {
     console.log("routerAudios");
@@ -46,6 +69,9 @@ routerAudios.use(function(req, res, next) {
         })
 });
 app.use("/audios/",routerAudios);
+
+
+
 
 app.set('port', 8081);
 app.set('db', 'mongodb://admin:sdi@cluster0-shard-00-00.qepb7.mongodb.net:27017,cluster0-shard-00-01.qepb7.mongodb.net:27017,cluster0-shard-00-02.qepb7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-lfxs82-shard-0&authSource=admin&retryWrites=true&w=majority');

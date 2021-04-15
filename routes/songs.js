@@ -150,6 +150,18 @@ module.exports = function(app, swig, DBManager) {
         });
     });
 
+    app.get('/song/remove/:id', function (req, res) {
+        let criteria = {"_id" : DBManager.mongo.ObjectID(req.params.id) };
+        DBManager.removeSong(criteria,function(songs){
+            if ( songs == null ){
+                res.send(response);
+            } else {
+                res.redirect("/uploads");
+            }
+        });
+    });
+
+
     app.get("/shop", function(req, res) {
         let criteria = {};
         if( req.query.search != null ){
