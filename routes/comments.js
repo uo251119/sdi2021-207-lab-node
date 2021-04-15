@@ -8,7 +8,7 @@ module.exports = function(app, swig, DBManager) {
         let comment = {
            author : req.session.user,
            text : req.body.text,
-           song_id : ObjectId(req.params.song_id),
+           song_id : DBManager.mongo.ObjectID(req.params.song_id),
         }
 
         DBManager.insertComment(comment, function(id) {

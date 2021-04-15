@@ -29,7 +29,9 @@ routerUserSession.use(function(req, res, next) {
 });
 app.use("/songs/add", routerUserSession);
 app.use("/uploads", routerUserSession);
-app.use("/comments", routerUserSession);
+app.use("/song/purchase", routerUserSession);
+app.use("/purchases", routerUserSession);
+
 
 // routerUserAuthor
 let routerUserAuthor = express.Router();
@@ -64,7 +66,19 @@ routerAudios.use(function(req, res, next) {
             if(req.session.user && songs[0].author == req.session.user ){
                 next();
             } else {
-                res.redirect("/shop");
+                let criteria = {
+                    user : req.session.user,
+                    songId : mongo.ObjectID(songId)
+                };
+
+                DBManager.getPurchases(criteria ,function(purchases){
+                    if (purchases != null && purchases.length > 0 ){
+                        next();
+                    } else {
+                        res.redirect("/purchases");
+                    }
+                });
+
             }
         })
 });

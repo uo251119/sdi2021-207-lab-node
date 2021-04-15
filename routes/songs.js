@@ -195,4 +195,43 @@ module.exports = function(app, swig, DBManager) {
             }
         });
     });
+
+    app.get('/song/purchase/:id', function (req, res) {
+        let songId = DBManager.mongo.ObjectID(req.params.id);
+        let purchase = {
+            user : req.session.usuario,
+            songId : songId
+        }
+        DBManager.insertPurchase(purchase ,function(purchaseId){
+            if ( purchaseId == null ){
+                res.send(response);
+            } else {
+                res.redirect("/purchases");
+            }
+        });
+    });
+
+    app.get('/purchases', function(req, res) {
+       let criteria = { "user" : req.session.user };
+
+       DBManager.getPurchases(criteria, function (purchases) {
+           if (purchases == null) {
+               res.send("Error al listar");
+           } else {
+               let purchasedSongsIds = [];
+               for (i = 0; i < purchases.length; i++) {
+                   purchasedSongsIds.push(purchases[i].songId);
+               }
+
+               let criteria = {"_id": {$in: purchasedSongsIds}}
+               DBManager.getSongs(criteria, function (songs) {
+                   let response = swig.renderFile('views/purchases.html',
+                       {
+                           songs: songs
+                       });
+                   res.send(response);
+               });
+           }
+       });
+    });
 };

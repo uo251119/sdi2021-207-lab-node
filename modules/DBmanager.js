@@ -141,4 +141,38 @@ module.exports = {
             }
         });
     },
+    insertPurchase: function(purchase, functionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                functionCallback(null);
+            } else {
+                let collection = db.collection('purchases');
+                collection.insert(purchase, function(err, result) {
+                    if (err) {
+                        functionCallback(null);
+                    } else {
+                        functionCallback(result.ops[0]._id);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+    getPurchases : function(criteria, functionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                functionCallback(null);
+            } else {
+                let collection = db.collection('purchases');
+                collection.find(criteria).toArray(function(err, users) {
+                    if (err) {
+                        functionCallback(null);
+                    } else {
+                        functionCallback(users);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
 };
