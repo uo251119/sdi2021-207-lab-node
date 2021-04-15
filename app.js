@@ -89,6 +89,9 @@ require("./routes/songs.js")(app, swig, DBManager);
 require("./routes/comments.js")(app, swig, DBManager);
 
 
+app.get('/', function (req, res) {
+    res.redirect('/shop');
+})
 
 // Launch server
 app.listen(app.get('port'), function () {

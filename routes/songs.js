@@ -48,7 +48,7 @@ module.exports = function(app, swig, DBManager) {
                                     if (err) {
                                         res.send("Error al subir el audio");
                                     } else {
-                                        res.send("Agregada id: "+ id);
+                                        res.redirect("/uploads");
                                     }
                                 });
                             }
@@ -91,7 +91,7 @@ module.exports = function(app, swig, DBManager) {
                     if( result == null){
                         res.send("Error en la modificación");
                     } else {
-                        res.send("Modificado");
+                        res.redirect("/uploads");
                     }
                 });
             }

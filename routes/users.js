@@ -19,7 +19,7 @@ module.exports = function(app, swig, DBManager) {
             if (id == null){
                 res.send("Error al insertar el usuario");
             } else {
-                res.send('Usuario Insertado ' + id);
+                res.redirect("/signin");
             }
         });
     });
@@ -42,7 +42,7 @@ module.exports = function(app, swig, DBManager) {
                 res.send("No identificado: ");
             } else {
                 req.session.user = users[0].email;
-                res.send("identificado");
+                res.redirect("/uploads");
             }
         });
 
