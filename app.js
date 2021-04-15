@@ -16,6 +16,9 @@ app.use(expressSession({
     saveUninitialized: true
 }));
 
+let fs = require('fs');
+let https = require('https');
+
 // routerUserSession
 var routerUserSession = express.Router();
 routerUserSession.use(function(req, res, next) {
@@ -107,7 +110,18 @@ app.get('/', function (req, res) {
     res.redirect('/shop');
 })
 
+app.use(function (err, req, res, next){
+    console.log("Error producido: " + err);
+    if(!res.headersSent) {
+        res.status(400);
+        res.send("Recurso no disponible");
+    }
+});
+
 // Launch server
-app.listen(app.get('port'), function () {
-    console.log('Server started');
+https.createServer({
+    key: fs.readFileSync('certificates/alice.key'),
+    cert: fs.readFileSync('certificates/alice.crt')
+}, app).listen(app.get('port'), function() {
+    console.log("Servidor activo");
 });
