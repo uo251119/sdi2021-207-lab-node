@@ -17,9 +17,9 @@ module.exports = function(app, swig, DBManager) {
         }
         DBManager.insertUser(user, function(id) {
             if (id == null){
-                res.send("Error al insertar el usuario");
+                res.redirect("/register?message=Error al registrar usuario");
             } else {
-                res.redirect("/signin");
+                res.redirect("/identificarse?message=Nuevo usuario registrado");
             }
         });
     });
@@ -39,7 +39,9 @@ module.exports = function(app, swig, DBManager) {
         DBManager.getUsers(criteria, function(users) {
             if (users == null || users.length == 0) {
                 req.session.user = null;
-                res.send("No identificado: ");
+                res.redirect("/signin" +
+                    "?message=Email o password incorrecto" +
+                    "&messageType = alert-danger");
             } else {
                 req.session.user = users[0].email;
                 res.redirect("/uploads");

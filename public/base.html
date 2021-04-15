@@ -36,14 +36,33 @@
   </div>
 </nav>
 
-
-
 <div class="container">
-
-	<!-- Contenido -->
-	
+  <script>
+      var message = getUrlParameter('message');
+      var messageType = getUrlParameter('messageType');
+      // Otra forma de recuperar los parametros de la url pero no compatible con IE
+      /* const params = new URLSearchParams(location.search);
+      var message = params.get("message");
+      var messageType = params.get("message");*/
+      if ( message != ""){
+          if (messageType == "" ){
+              messageType = 'alert-info';
+          }
+          $( ".container" )
+              .append("<div class='alert " + messageType + "'>" + message + " </div>");
+      }
+      function getUrlParameter(name) {
+          name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+          var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+          var results = regex.exec(location.search);
+          return results === null ? '' :
+              decodeURIComponent(results[1].replace(/\+/g, ' '));
+      };
+  </script>
+  <!-- Contenido -->
+  {% block main_content %}
+  <!-- Posible contenido por defecto -->
+  {% endblock %}
 </div>
-
-
 </body>
 </html>
