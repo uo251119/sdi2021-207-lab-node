@@ -168,17 +168,34 @@ module.exports = function(app, swig, DBManager) {
             criteria = { "title" : {$regex : ".*" + req.query.search + ".*"} };
         }
 
-        DBManager.getSongs(criteria, function(songs) {
+        let pg = parseInt(req.query.pg); // Es String !!!
+        if ( req.query.pg == null){ // Puede no venir el param
+            pg = 1;
+        }
+        DBManager.getSongsPg(criteria, pg, function(songs, total) {
             if (songs == null) {
                 res.send("Error al listar ");
             } else {
+                let ultimaPg = total/4;
+                if (total % 4 > 0 ){ // Sobran decimales
+                    ultimaPg = ultimaPg+1;
+                }
+                let pages = []; // paginas mostrar
+                for(let i = pg-2 ; i <= pg+2 ; i++){
+                    if ( i > 0 && i <= ultimaPg){
+                        pages.push(i);
+                    }
+                }
                 let response = swig.renderFile('views/shop.html',
                     {
-                        songs : songs
+                        songs : songs,
+                        pages : pages,
+                        current : pg
                     });
                 res.send(response);
             }
         });
+
     });
 
     app.get("/uploads", function(req, res) {
