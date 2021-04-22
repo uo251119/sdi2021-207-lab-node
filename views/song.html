@@ -6,21 +6,26 @@
 	 	<div class="row">
 		<div class="media col-xs-10">
 		  <div class="media-left media-middle">
-			<img class="media-object" src="/covers/{{ song._id.toString() }}.png"" >
+			<img class="media-object" src="/covers/{{ song._id.toString() }}.png" >
 		  </div>
 		  <div class="media-body">
 				<h2>{{ song.title }}</h2>
 				<p>{{ song.author }}</p>
 				<p>{{ song.genre }}</p>
+				{% if song.isPurchased == true %}
+					<audio controls>
+						<source src="/audios/{{ song._id.toString() }}.mp3" type="audio/mpeg">
+					</audio>
+				{% else %}
 				<a class="btn btn-primary pull-right"
-					 href="/song/purchase/{{song._id.toString()}}">{{ song.price
-					}} €</a>
-				<!-- Cambiar el precio por "reproducir" si ya está comprada -->
+					 href="/song/purchase/{{song._id.toString()}}">{{ song.price }} €</a>
 		  </div>
+			{% endif %}
 		</div>
 	  </div>
 
-		<div class="row" style="margin-top: 20px;" >
+		<div class="row" style="margin-top: 20px">
+			<h3>Comentarios</h3>
 		{% for comment in comments %}
 			<div class="media col-xs-10">
 			  <div class="media-left media-middle">
@@ -29,34 +34,12 @@
 					</a>
 			  </div>
 			  <div class="media-body">
-					<h4 class="media-heading">{{commment.author}}</h4>
+					<h4 class="media-heading">{{comment.author}}</h4>
 					{{comment.text}}
 				</div>
 		  </div>
 		{% endfor %}
-		<div class="media col-xs-10">
-			  <div class="media-left media-middle">
-				<a href="#">
-				  <img class="media-object" src="/img/user.png" >
-				</a>
-			  </div>
-			  <div class="media-body">
-				<h4 class="media-heading">Middle aligned media</h4>
-				Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-			  </div>
-		  </div>
-		<div class="media col-xs-10">
-			  <div class="media-left media-middle">
-				<a href="#">
-				  <img class="media-object" src="/img/user.png" >
-				</a>
-			  </div>
-			  <div class="media-body">
-				<h4 class="media-heading">Middle aligned media</h4>
-				Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-			  </div>
-		  </div>
-	  </div>
+		</div>
 
 		<form class="form-horizontal" method="post" action="/comments/{{ song._id.toString() }}" encType="multipart/form-data">
 			<div class="form-group">

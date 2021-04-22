@@ -135,13 +135,19 @@ module.exports = function(app, swig, DBManager) {
                 res.send("Error al recuperar la canción.");
             } else {
                 criteria = { "song_id" : DBManager.mongo.ObjectID(req.params.id) };
-                DBManager.getComments(criteria, function(comments){
-                    if(comments == null) {
+                DBManager.getComments(criteria, function(comments) {
+                    if (comments == null) {
                         res.send("Error al recuperar los comentarios.");
                     } else {
+                        let song = songs[0];
+                        if (isSongPurchased(song, req.session.user, res)) {
+                            song.isPurchased = true;
+                        } else {
+                            song.isPurchased = false;
+                        }
                         let response = swig.renderFile('views/song.html',
                             {
-                                song : songs[0]
+                                song : song
                             });
                         res.send(response);
                     }
@@ -149,6 +155,22 @@ module.exports = function(app, swig, DBManager) {
             }
         });
     });
+
+    function isSongPurchased(song, user, res) {
+        let criteria = { "user" : user };
+        DBManager.getPurchases(criteria, function(purchases) {
+            if (purchases == null) {
+                res.send("Error al recuperar las compras.");
+            } else {
+                for(let i = 0; i < purchases.length; i++) {
+                    if(purchases[i].song_id == song._id) {
+                        return true;
+                    }
+                }
+            }
+        });
+        return false;
+    }
 
     app.get('/song/remove/:id', function (req, res) {
         let criteria = {"_id" : DBManager.mongo.ObjectID(req.params.id) };
@@ -214,10 +236,10 @@ module.exports = function(app, swig, DBManager) {
     });
 
     app.get('/song/purchase/:id', function (req, res) {
-        let songId = DBManager.mongo.ObjectID(req.params.id);
+        let song_id = DBManager.mongo.ObjectID(req.params.id);
         let purchase = {
-            user : req.session.usuario,
-            songId : songId
+            user : req.session.user,
+            song_id : song_id
         }
         DBManager.insertPurchase(purchase ,function(purchaseId){
             if ( purchaseId == null ){
@@ -236,8 +258,8 @@ module.exports = function(app, swig, DBManager) {
                res.send("Error al listar");
            } else {
                let purchasedSongsIds = [];
-               for (i = 0; i < purchases.length; i++) {
-                   purchasedSongsIds.push(purchases[i].songId);
+               for (let i = 0; i < purchases.length; i++) {
+                   purchasedSongsIds.push(purchases[i].song_id);
                }
 
                let criteria = {"_id": {$in: purchasedSongsIds}}

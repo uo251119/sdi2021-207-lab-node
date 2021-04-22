@@ -39,6 +39,26 @@ module.exports = {
             }
         });
     },
+    getSongsPg : function(criteria, pg, functionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                functionCallback(null);
+            } else {
+                let collection = db.collection('songs');
+                collection.count(function(err, count){
+                    collection.find(criteria).skip( (pg-1)*4 ).limit( 4 )
+                        .toArray(function(err, songs) {
+                            if (err) {
+                                functionCallback(null);
+                            } else {
+                                functionCallback(songs, count);
+                            }
+                            db.close();
+                        });
+                });
+            }
+        });
+    },
     editSong : function(criteria, song, functionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {
@@ -175,24 +195,5 @@ module.exports = {
             }
         });
     },
-    getSongsPg : function(criteria, pg, functionCallback){
-        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
-            if (err) {
-                functionCallback(null);
-            } else {
-                let collection = db.collection('songs');
-                collection.count(function(err, count){
-                    collection.find(criteria).skip( (pg-1)*4 ).limit( 4 )
-                        .toArray(function(err, songs) {
-                            if (err) {
-                                functionCallback(null);
-                            } else {
-                                functionCallback(songs, count);
-                            }
-                            db.close();
-                        });
-                });
-            }
-        });
-    },
+
 };
