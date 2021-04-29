@@ -1,0 +1,82 @@
+<div id="songs-widget" >
+  <button class="btn btn-primary" onclick="addWidget()">Nueva Canción</button>
+  <button class="btn" onclick="loadSongs()" >Actualizar</button>
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Genre</th>
+      <th>Price</th>
+      <th class="col-md-1"></th>
+    </tr>
+    </thead>
+    <tbody id="tableBody">
+
+    </tbody>
+  </table>
+</div>
+
+<script>
+    var songs;
+    function loadSongs(){
+        $.ajax({
+            url: URLbase + "/song",
+            type: "GET",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(response) {
+                songs = response;
+                updateTable(songs);
+            },
+            error : function (error){
+                $( "#main-container" ).load("login-widget.html");
+            }
+        });
+    }
+    function updateTable(songs){
+        $( "#tableBody" ).empty(); // Vaciar la tabla
+        for (i = 0; i < songs.length; i++) {
+            $( "#tableBody" ).append(
+                "<tr id="+songs[i]._id + ">"+
+                "<td>"+songs[i].title + "</td>" +
+                "<td>"+songs[i].genre + "</td>" +
+                "<td>"+songs[i].price + "</td>" +
+                "<td>"+
+                "<a onclick = details('"+songs[i]._id+"')>Detalles</a><br>"+
+                "<a onclick = remove('"+songs[i]._id+"')>Eliminar</a>"+
+                "</td>"+
+                "</tr>" );
+            // Mucho cuidado con las comillas del eliminarCancion
+            //la id tiene que ir entre comillas ' '
+        }
+    }
+    function remove( _id ) {
+        $.ajax({
+            url: URLbase + "/song/"+_id,
+            type: "DELETE",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(response) {
+                console.log("Eliminada: "+_id);
+                $( "#"+_id ).remove(); // eliminar el <tr> de la canción
+            },
+            error : function (error){
+                $( "#main-container" ).load("login-widget.html");
+            }
+        });
+    }
+
+    function details(_id) {
+        selectedSongId = _id;
+        $( "#main-container" ).load( "details-widget.html");
+    }
+
+    function addWidget() {
+        $( "#main-container" ).load( "add-widget.html");
+    }
+
+
+    loadSongs();
+</script>
