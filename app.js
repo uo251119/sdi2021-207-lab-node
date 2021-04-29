@@ -19,6 +19,9 @@ app.use(expressSession({
 let fs = require('fs');
 let https = require('https');
 
+let jwt = require('jsonwebtoken');
+app.set('jwt',jwt);
+
 // routerUserSession
 var routerUserSession = express.Router();
 routerUserSession.use(function(req, res, next) {
@@ -34,7 +37,6 @@ app.use("/songs/add", routerUserSession);
 app.use("/uploads", routerUserSession);
 app.use("/song/purchase", routerUserSession);
 app.use("/purchases", routerUserSession);
-
 
 // routerUserAuthor
 let routerUserAuthor = express.Router();
@@ -87,9 +89,6 @@ routerAudios.use(function(req, res, next) {
 });
 app.use("/audios/",routerAudios);
 
-
-
-
 app.set('port', 8081);
 app.set('db', 'mongodb://admin:sdi@cluster0-shard-00-00.qepb7.mongodb.net:27017,cluster0-shard-00-01.qepb7.mongodb.net:27017,cluster0-shard-00-02.qepb7.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-lfxs82-shard-0&authSource=admin&retryWrites=true&w=majority');
 //app.set('db','mongodb://admin:sdi@tiendamusica-shard-00-00.wh9kn.mongodb.net:27017,tiendamusica-shard-00-01.wh9kn.mongodb.net:27017,tiendamusica-shard-00-02.wh9kn.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-pc4r5e-shard-0&authSource=admin&retryWrites=true&w=majority');
@@ -99,13 +98,45 @@ app.set('crypto', crypto);
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({extended : true}));
+
+// routerUsuarioToken
+let routerUserToken = express.Router();
+routerUserToken.use(function(req, res, next) {
+    // obtener el token, vía headers (opcionalmente GET y/o POST).
+    let token = req.headers['token'] || req.body.token || req.query.token;
+    if (token != null) {
+        // verificar el token
+        jwt.verify(token, 'secret', function(err, infoToken) {
+            if (err || (Date.now()/1000 - infoToken.time) > 240 ){
+                res.status(403); // Forbidden
+                res.json({
+                    access : false,
+                    error: 'Token invalido o caducado'
+                });
+                // También podríamos comprobar que intoToken.usuario existe
+                return;
+            } else {
+                // dejamos correr la petición
+                res.user = infoToken.user;
+                next();
+            }
+        });
+    } else {
+        res.status(403); // Forbidden
+        res.json({
+            access : false,
+            message: 'No hay Token'
+        });
+    }
+});
+// Aplicar routerUsuarioToken
+app.use('/api/song', routerUserToken);
 
 require("./routes/users.js")(app, swig, DBManager);
 require("./routes/songs.js")(app, swig, DBManager);
 require("./routes/comments.js")(app, swig, DBManager);
 require("./routes/songs-API.js")(app, DBManager);
-
 
 app.get('/', function (req, res) {
     res.redirect('/shop');

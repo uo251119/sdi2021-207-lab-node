@@ -70,7 +70,6 @@ module.exports = function(app, DBManager) {
     });
 
     app.put("/api/song/:id", function(req, res) {
-
         let criteria = { "_id" : DBManager.mongo.ObjectID(req.params.id) };
 
         let song = {}; // Solo los atributos a modificar
@@ -91,6 +90,33 @@ module.exports = function(app, DBManager) {
                 res.json({
                     message : "canción modificada",
                     _id : req.params.id
+                })
+            }
+        });
+    });
+
+    app.post("/api/authenticate/", function(req, res) {
+        let safe = app.get("crypto").createHmac('sha256', app.get('key'))
+            .update(req.body.password).digest('hex');
+
+        let criteria = {
+            email: req.body.email,
+            password: safe,
+        }
+
+        DBManager.getUsers(criteria, function (users) {
+            if (users == null || users.length == 0) {
+                res.json({
+                    authenticated : false
+                })
+            } else {
+                let token = app.get('jwt').sign(
+                    {user: criteria.email , time: Date.now()/1000},
+                    "secret");
+                res.status(200);
+                res.json({
+                    authenticated : true,
+                    token : token
                 })
             }
         });
