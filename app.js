@@ -104,6 +104,7 @@ app.use(bodyParser.urlencoded());
 require("./routes/users.js")(app, swig, DBManager);
 require("./routes/songs.js")(app, swig, DBManager);
 require("./routes/comments.js")(app, swig, DBManager);
+require("./routes/songs-API.js")(app, DBManager);
 
 
 app.get('/', function (req, res) {
